@@ -1,15 +1,37 @@
 import { useEffect, useRef } from "react";
 import useMusic from "../hooks/useMusic"
+import { Pause, Play, StepBack, StepForward } from "lucide-react";
 
 const MusicPlayer = () => {
     // What states will we have for the player? Play, Pause, CurrentIndexOfTrack, NextSong, PreviousSong
-    const {currentTrack, formatTime, currentTime, setCurrentTime, duration, setDuration} = useMusic();
+    const {
+        currentTrack, 
+        formatTime, 
+        currentTime, 
+        setCurrentTime, 
+        duration, 
+        setDuration,
+        nextTrack,
+        prevTrack,
+        isPlaying,
+        pause,
+        play
+    } = useMusic();
     const audioRef = useRef(null);
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if(!audio) return;
+        if(isPlaying){
+            audio.play().catch((err) => console.error(err));
+        }else{
+            audio.pause();
+        }
+    }, [isPlaying])
 
 
     useEffect(() => {
         const audio = audioRef.current;
-        console.log("audioRef.current.duration", Number(audioRef.current?.duration))
         if(!audio) return;
         // Run logic, whenever the metadata is loaded
         // To ensure the audio ref has a duration
@@ -18,16 +40,18 @@ const MusicPlayer = () => {
         }
 
         const handleTimeUpdate = () => {
-
+            setCurrentTime(audio.currentTime);
         }
 
-        const handleEnd = () => {
-
+        const handleEnded = () => {
+            nextTrack()
         }
 
         // Subscribe to an event listener
 
         audio.addEventListener("loadedmetadata", handleLoadedMetaData);
+        audio.addEventListener("timeupdate", handleTimeUpdate);
+        audio.addEventListener("ended", handleEnded);
 
         audio.load();
 
@@ -35,6 +59,8 @@ const MusicPlayer = () => {
 
         return () => {
             audio.removeEventListener("loadedmetadata", handleLoadedMetaData);
+            audio.removeEventListener("timeupdate", handleTimeUpdate);
+            audio.removeEventListener("ended", handleEnded);
         }
 
     }, [setDuration, setCurrentTime, currentTrack])
@@ -62,9 +88,27 @@ const MusicPlayer = () => {
                 value={currentTime || 0}
                 className="progress-bar"        
             />
-            <span className="time">{formatTime(duration)}</span>
-            
+            <span className="time">{formatTime(duration)}</span>            
         </div>
+        <div className="controls">
+
+
+            <button onClick={prevTrack} className="control-btn">
+                <StepBack />
+            </button>
+            <button 
+            onClick={() => (isPlaying ? pause() : play())}
+            className="control-btn play-btn">
+                {
+                    isPlaying ? <Pause/> : <Play />
+                }
+            </button>
+            <button onClick={nextTrack} className="control-btn">
+                <StepForward />
+            </button>
+        </div>
+
+
     </div>
   )
 }

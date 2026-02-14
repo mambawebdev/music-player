@@ -69,6 +69,8 @@ const useMusic = () => {
   const [currentTime, setCurrentTime] = useState(0);
   // Current Duration State
   const [duration, setDuration] = useState(0);
+  // Current Playing State
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Function to format time
 
@@ -76,6 +78,42 @@ const useMusic = () => {
   const handlePlaySong = (song, index) => {
         setCurrentTrack(song);
         setCurrentTrackIndex(index);
+  }
+
+  const nextTrack = () => {
+        setCurrentTrackIndex((prev) => {
+            /*
+
+            The Simple Version:
+            This code moves to the next song. When you reach the last song and press "next," it loops back to the first song instead of breaking.
+            The "Wrap Around" Magic:
+            Think of your songs like a circle of chairs:
+
+            Song 0 → Song 1 → Song 2 → Song 3 → Song 4 → back to Song 0
+
+            Here's what (prev + 1) % allSongs.length does:
+            prev + 1 = "Go to the next song"
+            % allSongs.length = "If you go past the last song, start over at the beginning"
+            5 Songs:
+            Currently at song 3 → (3 + 1) % 5 = 4 ✅ 
+            Currently at song 4 → (4 + 1) % 5 = 0 ✅ 
+
+            */
+            const nextIndex = (prev + 1) % allSongs.length
+            setCurrentTrack(allSongs[nextIndex]);
+            return nextIndex;
+        })
+        
+  }
+
+  const prevTrack = () => {
+    
+        setCurrentTrackIndex((prev) => {
+            const prevIndex = prev === 0 ? allSongs.length - 1 : prev - 1;
+            setCurrentTrack(allSongs[prevIndex]);
+            return prevIndex;
+        })
+
   }
 
   const formatTime = (time) => {
@@ -89,6 +127,14 @@ const useMusic = () => {
 
   }
 
+  const play = () => {
+    setIsPlaying(true);
+  }
+
+  const pause = () => {
+    setIsPlaying(false);
+  }
+
   return {
         allSongs, 
         handlePlaySong, 
@@ -98,7 +144,12 @@ const useMusic = () => {
         setCurrentTime,
         formatTime,
         duration,
-        setDuration
+        setDuration,
+        nextTrack,
+        prevTrack,
+        play,
+        pause,
+        isPlaying
     };
 }
 
