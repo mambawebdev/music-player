@@ -238,8 +238,15 @@ body {
 }
 
 .volume-icon {
-  font-size: 1.2rem;
+  font-size: 0.2rem;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.volume-icon > svg{
+  transform: scale(0.85);
+  cursor: pointer;
+}.volume-icon > svg:hover{
+  color: white;
 }
 
 .volume-bar {

@@ -69,6 +69,8 @@ const useMusic = () => {
   const [currentTime, setCurrentTime] = useState(0);
   // Current Duration State
   const [duration, setDuration] = useState(0);
+  // Current Volume State
+  const [volume, setVolume] = useState(0.2);
   // Current Playing State
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -78,12 +80,13 @@ const useMusic = () => {
   const handlePlaySong = (song, index) => {
         setCurrentTrack(song);
         setCurrentTrackIndex(index);
+        setIsPlaying(false);
   }
 
   const nextTrack = () => {
         setCurrentTrackIndex((prev) => {
             /*
-
+            2:00
             The Simple Version:
             This code moves to the next song. When you reach the last song and press "next," it loops back to the first song instead of breaking.
             The "Wrap Around" Magic:
@@ -103,6 +106,7 @@ const useMusic = () => {
             setCurrentTrack(allSongs[nextIndex]);
             return nextIndex;
         })
+        setIsPlaying(false);
         
   }
 
@@ -113,7 +117,7 @@ const useMusic = () => {
             setCurrentTrack(allSongs[prevIndex]);
             return prevIndex;
         })
-
+        setIsPlaying(false);
   }
 
   const formatTime = (time) => {
@@ -149,7 +153,9 @@ const useMusic = () => {
         prevTrack,
         play,
         pause,
-        isPlaying
+        isPlaying,
+        volume,
+        setVolume
     };
 }
 

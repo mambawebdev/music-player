@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import useMusic from "../hooks/useMusic"
-import { Pause, Play, StepBack, StepForward } from "lucide-react";
+import { Pause, Play, StepBack, StepForward, Volume } from "lucide-react";
 
 const MusicPlayer = () => {
     // What states will we have for the player? Play, Pause, CurrentIndexOfTrack, NextSong, PreviousSong
@@ -15,9 +15,33 @@ const MusicPlayer = () => {
         prevTrack,
         isPlaying,
         pause,
-        play
+        play,
+        volume,
+        setVolume
     } = useMusic();
+
     const audioRef = useRef(null);
+
+
+    const handleTimeChange = (e) => {
+        const audio = audioRef.current;
+        const newTime = parseFloat(e.target.value);
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+    }
+
+    const handleVolumeChange = (e) => {
+        const newVolume = parseFloat(e.target.value);
+        setVolume(newVolume);
+    }
+
+
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if(!audio) return;
+        audio.volume = volume;
+    }, [volume])
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -28,6 +52,7 @@ const MusicPlayer = () => {
             audio.pause();
         }
     }, [isPlaying])
+
 
 
     useEffect(() => {
@@ -65,7 +90,8 @@ const MusicPlayer = () => {
 
     }, [setDuration, setCurrentTime, currentTrack])
 
-    console.log(currentTrack)
+    const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   return (
     <div className='music-player'>
         <audio ref={audioRef} 
@@ -86,7 +112,8 @@ const MusicPlayer = () => {
                 max={duration || 0} 
                 step="0.1"
                 value={currentTime || 0}
-                className="progress-bar"        
+                className="progress-bar" 
+                onChange={handleTimeChange}       
             />
             <span className="time">{formatTime(duration)}</span>            
         </div>
@@ -108,6 +135,21 @@ const MusicPlayer = () => {
             </button>
         </div>
 
+        {/* Volume Container */}
+        <div className="volume-container">
+            <div className="volume-icon">
+                <Volume/>
+            </div>
+            <input 
+            onChange={handleVolumeChange}
+            value={volume}
+            type="range" 
+            min={0} 
+            max={1} 
+            step={0.1} 
+            style={{"--progress": `${progressPercentage}%`}}
+            className="volume-bar" />
+        </div>
 
     </div>
   )
